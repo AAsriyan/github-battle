@@ -1,57 +1,38 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import api from '../utils/api';
+var React = require('react');
+var PropTypes = require('prop-types');
+var api = require('../utils/api');
 
-function SelectLanguage(props) {
-  let languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python'];
+function SelectLanguage (props) {
+  var languages = ['All', 'JavaScript', 'Ruby', 'Java', 'CSS', 'Python'];
   return (
     <ul className='languages'>
-        {languages.map(lang => 
-          <li 
-            style={lang === props.selectedLanguage ? { color: '#d0021b' } : null }
+      {languages.map(function (lang) {
+        return (
+          <li
+            style={lang === props.selectedLanguage ? {color: '#d0021b'} : null}
             onClick={props.onSelect.bind(null, lang)}
             key={lang}>
-            {lang}
+              {lang}
           </li>
-        )}
+        )
+      })}
     </ul>
-  );
+  )
 }
 
-// This is the class version of this component
-
-// export class SelectLanguage extends Component {
-//   render() {
-    
-
-//     return (
-//       <ul className='languages'>
-//         {languages.map(lang => 
-//           <li 
-//             style={lang === this.props.selectedLanguage ? { color: '#d0021b' } : null }
-//             onClick={this.props.onSelect.bind(null, lang)}
-//             key={lang}>
-//             {lang}
-//           </li>
-//         )}
-//       </ul>
-//     )
-//   }
-// }
-
-function RepoGrid(props) {
+function RepoGrid (props) {
   return (
     <ul className='popular-list'>
-      {props.repos.map(function(repo, index) {
+      {props.repos.map(function (repo, index) {
         return (
           <li key={repo.name} className='popular-item'>
-            <div className="popular-rank">#{index + 1}</div>
-            <ul className="space-list-items">
+            <div className='popular-rank'>#{index + 1}</div>
+            <ul className='space-list-items'>
               <li>
-                <img 
-                  className="avatar" 
-                  src={repo.owner.avatar_url} 
-                  alt={'Avatar for' + repo.owner.login}
+                <img
+                  className='avatar'
+                  src={repo.owner.avatar_url}
+                  alt={'Avatar for ' + repo.owner.login}
                 />
               </li>
               <li><a href={repo.html_url}>{repo.name}</a></li>
@@ -62,34 +43,31 @@ function RepoGrid(props) {
         )
       })}
     </ul>
-  );
+  )
 }
 
 RepoGrid.propTypes = {
-  repos: PropTypes.array.isRequired
+  repos: PropTypes.array.isRequired,
 }
 
 SelectLanguage.propTypes = {
   selectedLanguage: PropTypes.string.isRequired,
   onSelect: PropTypes.func.isRequired,
-}
+};
 
-// lifecycle events
-
-export class Popular extends Component {
+class Popular extends React.Component {
   constructor(props) {
-    super(props);
+    super();
     this.state = {
       selectedLanguage: 'All',
-      repos: null
+      repos: null,
     };
+
     this.updateLanguage = this.updateLanguage.bind(this);
   }
-
   componentDidMount() {
-    this.updateLanguage(this.state.selectedLanguage);
+    this.updateLanguage(this.state.selectedLanguage)
   }
-
   updateLanguage(lang) {
     this.setState(function () {
       return {
@@ -99,28 +77,26 @@ export class Popular extends Component {
     });
 
     api.fetchPopularRepos(lang)
-    .then(function (repos) {
-      this.setState(function () {
-        return {
-          repos: repos
-        }
-      })
-    }.bind(this));
+      .then(function (repos) {
+        this.setState(function () {
+          return {
+            repos: repos
+          }
+        });
+      }.bind(this));
   }
-
   render() {
     return (
       <div>
-        <SelectLanguage 
+        <SelectLanguage
           selectedLanguage={this.state.selectedLanguage}
-          onSelect={this.updateLanguage}
-        />
+          onSelect={this.updateLanguage} />
         {!this.state.repos
-          ? <p>LOADING</p>
-          : <RepoGrid repos={this.state.repos}/>}
-        
+          ? <p>LOADING!</p>
+          : <RepoGrid repos={this.state.repos} />}
       </div>
-  )}
+    )
+  }
 }
 
-export default Popular
+module.exports = Popular;
